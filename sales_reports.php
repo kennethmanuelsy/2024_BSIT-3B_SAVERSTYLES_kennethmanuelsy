@@ -10,39 +10,93 @@ if (mysqli_connect_errno()) {
     exit();
 }
 
-// Generate current date
-$currentDate = date('Y-m-d');
+// SQL query to retrieve report details
+$sql = "SELECT * FROM Report";
 
-// Insert data into Shopping_Cart_Final
-$sql_insert = "INSERT INTO Shopping_Cart_Final (CustomerID, ItemName, Quantity, Price, Total, OrderDate)
-               SELECT CustomerID, ItemName, Quantity, Price, Total, '$currentDate'
-               FROM Shopping_Cart
-               WHERE CustomerID=" . $_SESSION['ID'];
+$result = mysqli_query($con, $sql);
 
-if (mysqli_query($con, $sql_insert)) {
-    // Calculate total items sold and total revenue
-    $sql_sales = "SELECT SUM(Quantity) AS total_items, SUM(Total) AS total_revenue FROM Shopping_Cart_Final WHERE OrderDate='$currentDate'";
-    $result_sales = mysqli_query($con, $sql_sales);
-    $row_sales = mysqli_fetch_assoc($result_sales);
-    $total_items = $row_sales['total_items'];
-    $total_revenue = $row_sales['total_revenue'];
-
-    // Insert sales report into Report table
-    $sql_insert_report = "INSERT INTO Report (total_items_sold, total_revenue, order_date) VALUES ('$total_items', '$total_revenue', '$currentDate')";
-    if (!mysqli_query($con, $sql_insert_report)) {
-        echo "Error: " . $sql_insert_report . "<br>" . mysqli_error($con);
-    } else {
-        // Delete data from Shopping_Cart
-        $sql_delete = "DELETE FROM Shopping_Cart WHERE CustomerID=" . $_SESSION['ID'];
-        mysqli_query($con, $sql_delete);
-
-        // Close connection
-        mysqli_close($con);
-
-        // Redirect to Cart.php
-        echo '<script type="text/javascript">alert("Thank You For Your order");window.location=\'Cart.php\';</script>';
-    }
-} else {
-    echo "Error: " . $sql_insert . "<br>" . mysqli_error($con);
-}
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Saverstyles</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        .style9 {font-size: 95%; font-weight: bold; color: #003300; font-family: Verdana, Arial, Helvetica, sans-serif; }
+        .style10 {color: #FFFFFF}
+        .style3 {font-weight: bold}
+    </style>
+</head>
+<body>
+<div id="wrapper">
+  
+  <?php
+  include "Header.php";
+  ?>
+  
+  <div id="content">
+    <h2><span style="color:#003300"> Sales Report</span></h2>
+    <table width="100%" border="1" bordercolor="#003300">
+      <tr>
+        <td bgcolor="#4B692D" class="style10 style3"><strong>Report ID</strong></td>
+        <td bgcolor="#4B692D" class="style10 style3"><strong>Date</strong></td>
+        <td bgcolor="#4B692D" class="style10 style3"><strong>Total Items Sold</strong></td>
+        <td bgcolor="#4B692D" class="style10 style3"><strong>Total Revenue</strong></td>
+      </tr>
+      <?php
+while($row = mysqli_fetch_array($result))
+{
+    $report_id = $row['report_id'];
+    $order_date = $row['order_date'];
+    $total_items_sold = $row['total_items_sold'];
+    $total_revenue = $row['total_revenue'];
+
+?>
+      <tr>
+        <td class="style3"><div align="left" class="style9 style5"><strong><?php echo $report_id;?></strong></div></td>
+        <td class="style3"><div align="left" class="style9 style5"><strong><?php echo $order_date;?></strong></div></td>
+        <td class="style3"><div align="left" class="style9 style5"><strong><?php echo $total_items_sold;?></strong></div></td>
+        <td class="style3"><div align="left" class="style9 style5"><strong><?php echo $total_revenue;?></strong></div></td>
+      </tr>
+      <?php
+}
+
+$records = mysqli_num_rows($result);
+?>
+      <?php
+
+mysqli_close($con);
+?>
+    </table>
+    <p align="justify">&nbsp;</p>
+    <table width="100%" border="0" cellspacing="3" cellpadding="3">
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td><p><img src="img/Jeans.jpg" alt="box" width="100" height="100" hspace="10" align="left" class="imgleft" title="box" /></p></td>
+        <td><p><img src="img/asd.jpg" alt="box" width="100" height="100" hspace="10" align="left" class="imgleft" title="box" /></p></td>
+        <td><p><img src="img/images.jpg" alt="box" width="100" height="100" hspace="10" align="left" class="imgleft" title="box" /></p></td>
+      </tr>
+      <tr>
+        <td height="26" bgcolor="#BCE0A8"><div align="center" class="style9">Jeans</div></td>
+        <td bgcolor="#BCE0A8"><div align="center" class="style9">Bleasures</div></td>
+        <td bgcolor="#BCE0A8"><div align="center" class="style9">T-Shirts</div></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+  </div>
+ <?php
+ include "Right.php";
+ ?>
+  <div style="clear:both;"></div>
+   <?php
+ include "Footer.php";
+ ?>
+</div>
+</body>
+</html>
