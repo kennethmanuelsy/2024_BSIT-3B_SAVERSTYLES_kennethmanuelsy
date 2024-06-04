@@ -10,8 +10,8 @@ if (mysqli_connect_errno()) {
     exit();
 }
 
-// SQL query to retrieve report details
-$sql = "SELECT * FROM Report";
+// SQL query to retrieve daily sales report
+$sql = "SELECT order_date, SUM(total_revenue) AS daily_revenue FROM Report GROUP BY order_date";
 
 $result = mysqli_query($con, $sql);
 
@@ -32,33 +32,25 @@ $result = mysqli_query($con, $sql);
 <body>
 <div id="wrapper">
   
-  <?php
-  include "Header.php";
-  ?>
+  <?php include "Header.php"; ?>
   
   <div id="content">
     <h2><span style="color:#003300"> Sales Report</span></h2>
     <table width="100%" border="1" bordercolor="#003300">
       <tr>
-        <td bgcolor="#4B692D" class="style10 style3"><strong>Report ID</strong></td>
         <td bgcolor="#4B692D" class="style10 style3"><strong>Date</strong></td>
-        <td bgcolor="#4B692D" class="style10 style3"><strong>Total Items Sold</strong></td>
-        <td bgcolor="#4B692D" class="style10 style3"><strong>Total Revenue</strong></td>
+        <td bgcolor="#4B692D" class="style10 style3"><strong>Daily Revenue</strong></td>
       </tr>
       <?php
 while($row = mysqli_fetch_array($result))
 {
-    $report_id = $row['report_id'];
     $order_date = $row['order_date'];
-    $total_items_sold = $row['total_items_sold'];
-    $total_revenue = $row['total_revenue'];
+    $daily_revenue = $row['daily_revenue'];
 
 ?>
       <tr>
-        <td class="style3"><div align="left" class="style9 style5"><strong><?php echo $report_id;?></strong></div></td>
         <td class="style3"><div align="left" class="style9 style5"><strong><?php echo $order_date;?></strong></div></td>
-        <td class="style3"><div align="left" class="style9 style5"><strong><?php echo $total_items_sold;?></strong></div></td>
-        <td class="style3"><div align="left" class="style9 style5"><strong><?php echo $total_revenue;?></strong></div></td>
+        <td class="style3"><div align="left" class="style9 style5"><strong><?php echo $daily_revenue;?></strong></div></td>
       </tr>
       <?php
 }
@@ -90,13 +82,9 @@ mysqli_close($con);
     </table>
     <p>&nbsp;</p>
   </div>
- <?php
- include "Right.php";
- ?>
+ <?php include "Right.php"; ?>
   <div style="clear:both;"></div>
-   <?php
- include "Footer.php";
- ?>
+   <?php include "Footer.php"; ?>
 </div>
 </body>
 </html>
